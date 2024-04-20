@@ -18,7 +18,7 @@ public class Product {
 	private Integer id;
 	private String name;
 	private String description;
-	private String image;
+	private byte[] image;
 	private double price;
 	private int cuantity;
 	
@@ -27,7 +27,9 @@ public class Product {
 	
 	
 
-	public Product(Integer id, String name, String description, String image, double price, int cuantity, User user) {
+
+
+	public Product(Integer id, String name, String description, byte[] image, double price, int cuantity, User user) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -37,6 +39,20 @@ public class Product {
 		this.cuantity = cuantity;
 		this.user = user;
 	}
+	
+	
+
+	public Product(Integer id, String name, String description, double price, int cuantity, User user) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.price = price;
+		this.cuantity = cuantity;
+		this.user = user;
+	}
+
+
 
 	public Product() {
 		super();
@@ -66,13 +82,13 @@ public class Product {
 		this.description = description;
 	}
 
-	public String getImage() {
-		return image;
-	}
+	public byte[] getImage() {
+        return image;
+    }
 
-	public void setImage(String image) {
-		this.image = image;
-	}
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
 
 	public double getPrice() {
 		return price;
