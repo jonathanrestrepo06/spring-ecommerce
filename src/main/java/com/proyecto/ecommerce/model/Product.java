@@ -2,6 +2,8 @@ package com.proyecto.ecommerce.model;
 
 
 
+import java.util.Arrays;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -118,8 +120,8 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return "Producto [id=" + id + ", name=" + name + ", description=" + description + ", image=" + image
-				+ ", price=" + price + ", cuantity=" + cuantity + "]";
+		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", image="
+				+ Arrays.toString(image) + ", price=" + price + ", cuantity=" + cuantity + ", user=" + user + "]";
 	}
 	
 	
