@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.proyecto.ecommerce.model.Product;
 import com.proyecto.ecommerce.model.User;
 import com.proyecto.ecommerce.service.ProductService;
+import com.proyecto.ecommerce.service.UploadFileService;
 
 
 @Controller
@@ -29,6 +30,8 @@ public class ProductController {
 	
 	@Autowired
 	private ProductService productService;
+	@Autowired
+	private UploadFileService uploadFile;
 	
 	@GetMapping("")
 	public String show(Model model) {
@@ -42,28 +45,20 @@ public class ProductController {
 	}
 	
 	@PostMapping("/save")
-	public String save(@ModelAttribute Product product, @RequestParam(name = "image", required = false) MultipartFile imageFile, RedirectAttributes redirectAttributes) {
+	public String save(@ModelAttribute Product product, @RequestParam(name = "img", required = false) MultipartFile imageFile, RedirectAttributes redirectAttributes) throws IOException {
 	    
 	    LOGGER.info("Received product object: {}", product);
 	    
-	    if (imageFile != null && !imageFile.isEmpty()) {
-	        try {
-	            
-	            String contentType = imageFile.getContentType();
-	            if (contentType != null && (contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
-	                byte[] bytes = imageFile.getBytes();
-	                
-	                product.setImage(bytes);
-	            } else {
-	                redirectAttributes.addFlashAttribute("error", "Por favor, sube una imagen JPEG o PNG.");
-	                return "redirect:/products";
-	            }
-	        } catch (IOException e) {
-	            LOGGER.error("Error handling image file", e);
-	            redirectAttributes.addFlashAttribute("error", "Error al procesar la imagen.");
-	            return "redirect:/products";
-	        }
+	    if (product.getId()==null) {
+	    	
+	    	String nameImage = uploadFile.saveImage(imageFile);
+		    product.setImage(nameImage); 
+		    
+	    }else {
+	    	
+	    	
 	    }
+	    
 	    
 	    User user = new User(1,"","","","","","","");
 	    product.setUser(user);
@@ -85,13 +80,37 @@ public class ProductController {
 	}
 	
 	@PostMapping("/update")
-	public String update(Product product) {		
+	public String update(Product product,  @RequestParam(name = "img", required = false) MultipartFile imageFile, RedirectAttributes redirectAttributes) throws IOException {
+		if(imageFile.isEmpty()) {
+    		
+    		Product p = new Product();
+    		p = productService.get(product.getId()).get();
+    		product.setImage(p.getImage());
+    	}else {
+    		Product p = new Product();
+    		p = productService.get(product.getId()).get();
+    		
+    		if (!p.getImage().equals("defaul.jpg")) {
+    			uploadFile.deleteImage(p.getImage());
+    		}
+    		String nameImage = uploadFile.saveImage(imageFile);
+		    product.setImage(nameImage); 
+    		
+    	}
+		
 		productService.update(product);		
 		return "redirect:/products";
 	}
 	
 	@GetMapping("/delete/{id}")
-	public String delete(@PathVariable Integer id) {		
+	public String delete(@PathVariable Integer id) {
+		
+		Product p = new Product();
+		p = productService.get(id).get();
+		
+		if (!p.getImage().equals("defaul.jpg")) {
+			uploadFile.deleteImage(p.getImage());
+		}
 		productService.delete(id);		
 		return "redirect:/products";
 	}
