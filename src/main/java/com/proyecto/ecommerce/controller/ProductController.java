@@ -81,14 +81,16 @@ public class ProductController {
 	
 	@PostMapping("/update")
 	public String update(Product product,  @RequestParam(name = "img", required = false) MultipartFile imageFile, RedirectAttributes redirectAttributes) throws IOException {
+		
+		Product p = new Product();
+		p = productService.get(product.getId()).get();
+		
+			
 		if(imageFile.isEmpty()) {
     		
-    		Product p = new Product();
-    		p = productService.get(product.getId()).get();
-    		product.setImage(p.getImage());
+			product.setImage(p.getImage());
+    		
     	}else {
-    		Product p = new Product();
-    		p = productService.get(product.getId()).get();
     		
     		if (!p.getImage().equals("defaul.jpg")) {
     			uploadFile.deleteImage(p.getImage());
@@ -97,7 +99,7 @@ public class ProductController {
 		    product.setImage(nameImage); 
     		
     	}
-		
+		product.setUser(p.getUser());
 		productService.update(product);		
 		return "redirect:/products";
 	}
