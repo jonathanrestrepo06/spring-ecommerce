@@ -57,7 +57,7 @@ public class HomeController {
 	}
 	
 	@PostMapping("/cart")
-	public String addCart(@RequestParam Integer id, @RequestParam Integer cuantity) {
+	public String addCart(@RequestParam Integer id, @RequestParam Integer cuantity, Model model) {
 		
 		DetailOrder detailOrder = new DetailOrder();
 		Product product = new Product();
@@ -68,9 +68,52 @@ public class HomeController {
 		log.info("Product added: {}",optionalProduct.get());
 		log.info("Cuantity: {}",cuantity);
 		
+		product = optionalProduct.get();
+		
+		detailOrder.setCuantity(cuantity);
+		detailOrder.setPrice(product.getPrice());
+		detailOrder.setName(product.getName());
+		detailOrder.setTotal(product.getPrice()*cuantity);
+		detailOrder.setProduct(product);
+		
+		details.add(detailOrder);
+		
+		valueTotal = details.stream().mapToDouble(dt->dt.getTotal()).sum();
+		
+		order.setTotal(valueTotal);
+		
+		model.addAttribute("cart",details);
+		model.addAttribute("order",order);
+		
+		
 		return "user/shoppingCart";
 	}
 	
+	@GetMapping("/delete/cart/{id}")
+	public String deleteProductCart(@PathVariable Integer id, Model model) {
+		
+		List<DetailOrder> ordersNew = new ArrayList<DetailOrder>();
+		
+		for(DetailOrder detailOrder : details) {
+			
+			if(detailOrder.getProduct().getId() != id) {
+				
+				ordersNew.add(detailOrder);
+			}
+		}
+		
+		details = ordersNew;
+		
+		double valueTotal = 0;
+		valueTotal = details.stream().mapToDouble(dt->dt.getTotal()).sum();
+		
+		order.setTotal(valueTotal);
+		
+		model.addAttribute("cart",details);
+		model.addAttribute("order",order);
+		
+		return "user/shoppingCart";
+	}
 	
 
 }
